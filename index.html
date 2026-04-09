@@ -1410,9 +1410,9 @@
         id: 'q32', dim: 'So3',
         text: '你给别人打了 200 字小作文，临发前突然沉默了：',
         options: [
-          { label: '全删并假装无事发生', value: 1 },
+          { label: '全删并假装无事发生', value: 3 },
           { label: '留一句“算了没事”', value: 2 },
-          { label: '原文发出并追加一句“你自己品”', value: 3 }
+          { label: '原文发出并追加一句“你自己品”', value: 1 }
         ]
       },
       {
@@ -1509,9 +1509,9 @@
         id: 'q43', dim: 'So2',
         text: '朋友凌晨两点给你发 11 条 60 秒语音：',
         options: [
-          { label: '先装没看见，天亮再说', value: 1 },
+          { label: '先装没看见，天亮再说', value: 3 },
           { label: '转文字看看值不值得听', value: 2 },
-          { label: '直接回拨，今天就把这事解决', value: 3 }
+          { label: '直接回拨，今天就把这事解决', value: 1 }
         ]
       },
       {
@@ -1527,18 +1527,18 @@
         id: 'q45', dim: 'So3',
         text: '你被人误会了，但解释会显得很像在急：',
         options: [
-          { label: '算了，误会就误会', value: 1 },
+          { label: '算了，误会就误会', value: 3 },
           { label: '会解释，但留一半体面', value: 2 },
-          { label: '当场澄清，今天谁都别想带着误会睡觉', value: 3 }
+          { label: '当场澄清，今天谁都别想带着误会睡觉', value: 1 }
         ]
       },
       {
         id: 'q46', dim: 'E2',
         text: '暧昧对象突然换了头像和签名，你会：',
         options: [
-          { label: '开始做阅读理解', value: 1 },
+          { label: '开始做阅读理解', value: 3 },
           { label: '多看两眼，但不表现出来', value: 2 },
-          { label: '该聊聊该睡睡，不给自己加戏', value: 3 }
+          { label: '该聊聊该睡睡，不给自己加戏', value: 1 }
         ]
       },
       {
@@ -2208,9 +2208,12 @@
         : '全选完才会放行。世界已经够乱了，起码把题做完整。';
     }
 
-    function sumToLevel(score) {
-      if (score <= 3) return 'L';
-      if (score === 4) return 'M';
+    function sumToLevel(score, questionCount = 2) {
+      const minScore = questionCount;
+      const maxScore = questionCount * 3;
+      const normalized = (score - minScore) / (maxScore - minScore);
+      if (normalized < 1 / 3) return 'L';
+      if (normalized < 2 / 3) return 'M';
       return 'H';
     }
 
@@ -2229,14 +2232,16 @@
     function computeResult() {
       const rawScores = {};
       const levels = {};
+      const questionCounts = {};
       Object.keys(dimensionMeta).forEach(dim => { rawScores[dim] = 0; });
 
       questions.forEach(q => {
         rawScores[q.dim] += Number(app.answers[q.id] || 0);
+        questionCounts[q.dim] = (questionCounts[q.dim] || 0) + 1;
       });
 
       Object.entries(rawScores).forEach(([dim, score]) => {
-        levels[dim] = sumToLevel(score);
+        levels[dim] = sumToLevel(score, questionCounts[dim]);
       });
 
       const userVector = dimensionOrder.map(dim => levelNum(levels[dim]));

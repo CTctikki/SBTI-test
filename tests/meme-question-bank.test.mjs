@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -12,6 +13,41 @@ function parseQuestions(source) {
   const match = source.match(/const questions = \[([\s\S]*?)\r?\n\s*\];\r?\n\s*const specialQuestions = \[/);
   assert.ok(match, 'questions array should exist in index.html');
   return Function(`return ([${match[1]}\n]);`)();
+}
+
+function loadFunction(source, functionName) {
+  const start = source.indexOf(`function ${functionName}(`);
+  assert.ok(start >= 0, `${functionName} should exist in index.html`);
+
+  const braceStart = source.indexOf('{', start);
+  assert.ok(braceStart >= 0, `${functionName} should have a body`);
+
+  let depth = 0;
+  for (let index = braceStart; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === '{') depth += 1;
+    if (char === '}') {
+      depth -= 1;
+      if (depth === 0) {
+        const functionSource = source.slice(start, index + 1);
+        const context = vm.createContext({});
+        vm.runInContext(`result = (${functionSource});`, context);
+        return context.result;
+      }
+    }
+  }
+
+  assert.fail(`could not parse ${functionName}`);
+}
+
+function expectedLevel(questionCount, score) {
+  const minScore = questionCount;
+  const maxScore = questionCount * 3;
+  const normalized = (score - minScore) / (maxScore - minScore);
+
+  if (normalized < 1 / 3) return 'L';
+  if (normalized < 2 / 3) return 'M';
+  return 'H';
 }
 
 test('regular question bank expands to 50 questions with the approved distribution', () => {
@@ -41,6 +77,26 @@ test('regular question bank expands to 50 questions with the approved distributi
     So2: 3,
     So3: 4,
   });
+});
+
+test('sumToLevel buckets normalized score ranges across 2, 3, and 4-question dimensions', () => {
+  const sumToLevel = loadFunction(html, 'sumToLevel');
+
+  const cases = [
+    { questionCount: 2, score: 2 },
+    { questionCount: 2, score: 4 },
+    { questionCount: 2, score: 6 },
+    { questionCount: 3, score: 5 },
+    { questionCount: 4, score: 8 }
+  ];
+
+  for (const { questionCount, score } of cases) {
+    assert.equal(
+      sumToLevel(score, questionCount),
+      expectedLevel(questionCount, score),
+      `${questionCount}-question dimension score ${score}`
+    );
+  }
 });
 
 test('q31 through q50 map to the approved meme dimensions', () => {
@@ -74,4 +130,14 @@ test('q31 through q50 map to the approved meme dimensions', () => {
     q49: 'Ac3',
     q50: 'S2',
   });
+});
+
+test('reversed meme questions keep their corrected option polarity', () => {
+  const questions = parseQuestions(html);
+  const byId = new Map(questions.map((question) => [question.id, question]));
+
+  assert.deepEqual(byId.get('q32').options.map((option) => option.value), [3, 2, 1]);
+  assert.deepEqual(byId.get('q43').options.map((option) => option.value), [3, 2, 1]);
+  assert.deepEqual(byId.get('q45').options.map((option) => option.value), [3, 2, 1]);
+  assert.deepEqual(byId.get('q46').options.map((option) => option.value), [3, 2, 1]);
 });
