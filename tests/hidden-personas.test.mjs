@@ -46,18 +46,60 @@ function loadFunctionInSandbox(source, functionName, sandbox) {
   assert.fail(`could not parse ${functionName}`);
 }
 
+function createHiddenResultHarness() {
+  const questions = parseQuestions(html);
+  const dimensionOrder = ['S1', 'S2', 'S3', 'E1', 'E2', 'E3', 'A1', 'A2', 'A3', 'Ac1', 'Ac2', 'Ac3', 'So1', 'So2', 'So3'];
+  const dimensionMeta = Object.fromEntries(dimensionOrder.map((dim) => [dim, { name: dim }]));
+  const answersById = Object.fromEntries(questions.map((question) => [question.id, 2]));
+  const typeLibrary = parseObjectLiteral(html, 'TYPE_LIBRARY');
+  let drunkFlag = false;
+
+  const computeResult = loadFunctionInSandbox(html, 'computeResult', {
+    questions,
+    dimensionMeta,
+    dimensionOrder,
+    app: { answers: answersById },
+    NORMAL_TYPES: [{ code: 'TEST', pattern: 'MMMMMMMMMMMMMMM' }],
+    TYPE_LIBRARY: typeLibrary,
+    parsePattern: (pattern) => pattern.replace(/-/g, '').split(''),
+    levelNum: (level) => ({ L: 1, M: 2, H: 3 }[level]),
+    sumToLevel: (score, questionCount) => {
+      const minScore = questionCount;
+      const maxScore = questionCount * 3;
+      const normalized = (score - minScore) / (maxScore - minScore);
+      if (normalized < 1 / 3) return 'L';
+      if (normalized < 2 / 3) return 'M';
+      return 'H';
+    },
+    getSeenZenTriggered: () => answersById.q31 === 1 && answersById.q32 === 3 && answersById.q43 === 3,
+    getDeleteArtistTriggered: () => answersById.q32 === 3 && answersById.q37 === 1 && answersById.q50 === 1,
+    getFoundrTriggered: () => answersById.q33 === 1 && answersById.q42 === 2 && answersById.q49 === 1,
+    getSubMarTriggered: () => answersById.q31 === 1 && answersById.q43 === 3 && answersById.q44 === 1,
+    getDrunkTriggered: () => drunkFlag
+  });
+
+  return {
+    answersById,
+    computeResult,
+    questions,
+    setDrunk(value) {
+      drunkFlag = value;
+    }
+  };
+}
+
 const hiddenPersonas = [
   {
     code: 'SEEN-ZEN',
     cn: '已读不回仙人',
     helper: 'getSeenZenTriggered',
-    answers: { q31: 1, q32: 1, q43: 1 }
+    answers: { q31: 1, q32: 3, q43: 3 }
   },
   {
     code: 'DEL-ART',
     cn: '深夜删文艺术家',
     helper: 'getDeleteArtistTriggered',
-    answers: { q32: 1, q37: 1, q50: 1 }
+    answers: { q32: 3, q37: 1, q50: 1 }
   },
   {
     code: 'FOUNDR',
@@ -69,7 +111,7 @@ const hiddenPersonas = [
     code: 'SUB-MAR',
     cn: '群聊核潜艇',
     helper: 'getSubMarTriggered',
-    answers: { q31: 1, q43: 1, q44: 1 }
+    answers: { q31: 1, q43: 3, q44: 1 }
   }
 ];
 
@@ -90,49 +132,75 @@ test('hidden persona assets, helpers, and codes are wired into the app', () => {
   }
 });
 
-test('computeResult resolves each new hidden persona for its crafted answer set', () => {
+test('hidden persona helpers honor the corrected q32 and q43 polarity', () => {
   const questions = parseQuestions(html);
-  const dimensionOrder = ['S1', 'S2', 'S3', 'E1', 'E2', 'E3', 'A1', 'A2', 'A3', 'Ac1', 'Ac2', 'Ac3', 'So1', 'So2', 'So3'];
-  const dimensionMeta = Object.fromEntries(dimensionOrder.map((dim) => [dim, { name: dim }]));
   const answersById = Object.fromEntries(questions.map((question) => [question.id, 2]));
-  const typeLibrary = parseObjectLiteral(html, 'TYPE_LIBRARY');
+  const seenZen = loadFunctionInSandbox(html, 'getSeenZenTriggered', { app: { answers: answersById } });
+  const deleteArtist = loadFunctionInSandbox(html, 'getDeleteArtistTriggered', { app: { answers: answersById } });
+  const subMar = loadFunctionInSandbox(html, 'getSubMarTriggered', { app: { answers: answersById } });
 
-  const computeResult = loadFunctionInSandbox(html, 'computeResult', {
-    questions,
-    dimensionMeta,
-    dimensionOrder,
-    app: { answers: answersById },
-    NORMAL_TYPES: [{ code: 'TEST', pattern: 'MMMMMMMMMMMMMMM' }],
-    TYPE_LIBRARY: typeLibrary,
-    parsePattern: (pattern) => pattern.replace(/-/g, '').split(''),
-    levelNum: (level) => ({ L: 1, M: 2, H: 3 }[level]),
-    sumToLevel: (score, questionCount) => {
-      const minScore = questionCount;
-      const maxScore = questionCount * 3;
-      const normalized = (score - minScore) / (maxScore - minScore);
-      if (normalized < 1 / 3) return 'L';
-      if (normalized < 2 / 3) return 'M';
-      return 'H';
-    },
-    getSeenZenTriggered: () => answersById.q31 === 1 && answersById.q32 === 1 && answersById.q43 === 1,
-    getDeleteArtistTriggered: () => answersById.q32 === 1 && answersById.q37 === 1 && answersById.q50 === 1,
-    getFoundrTriggered: () => answersById.q33 === 1 && answersById.q42 === 2 && answersById.q49 === 1,
-    getSubMarTriggered: () => answersById.q31 === 1 && answersById.q43 === 1 && answersById.q44 === 1,
-    getDrunkTriggered: () => false
-  });
+  answersById.q31 = 1;
+  answersById.q32 = 1;
+  answersById.q43 = 1;
+  assert.equal(seenZen(), false, 'old q32/q43 values should no longer trigger SEEN-ZEN');
+  assert.equal(deleteArtist(), false, 'old q32 value should no longer trigger DEL-ART');
+  assert.equal(subMar(), false, 'old q43 value should no longer trigger SUB-MAR');
+
+  answersById.q32 = 3;
+  answersById.q43 = 3;
+  assert.equal(seenZen(), true, 'corrected q32/q43 values should trigger SEEN-ZEN');
+
+  answersById.q37 = 1;
+  answersById.q50 = 1;
+  assert.equal(deleteArtist(), true, 'corrected q32 value should trigger DEL-ART');
+
+  answersById.q44 = 1;
+  assert.equal(subMar(), true, 'corrected q43 value should trigger SUB-MAR');
+});
+
+test('computeResult resolves each new hidden persona for its crafted answer set', () => {
+  const harness = createHiddenResultHarness();
 
   for (const persona of hiddenPersonas) {
-    for (const question of questions) {
-      answersById[question.id] = 2;
+    for (const question of harness.questions) {
+      harness.answersById[question.id] = 2;
     }
     for (const [questionId, value] of Object.entries(persona.answers)) {
-      answersById[questionId] = value;
+      harness.answersById[questionId] = value;
     }
-    const result = computeResult();
+    harness.setDrunk(false);
+    const result = harness.computeResult();
     assert.equal(result.finalType.code, persona.code, `${persona.code} should win for its trigger answers`);
     assert.equal(result.finalType.cn, persona.cn, `${persona.code} should keep approved Chinese name`);
     assert.equal(result.secondaryType.code, 'TEST', `${persona.code} should keep the best normal persona as secondaryType`);
     assert.equal(result.modeKicker, '隐藏人格已激活', `${persona.code} should use hidden persona kicker`);
     assert.equal(result.special, true, `${persona.code} should mark the result as special`);
   }
+});
+
+test('computeResult keeps DRUNK precedence and the documented hidden-persona branch order', () => {
+  const harness = createHiddenResultHarness();
+  for (const question of harness.questions) {
+    harness.answersById[question.id] = 2;
+  }
+
+  Object.assign(harness.answersById, {
+    q31: 1,
+    q32: 3,
+    q37: 1,
+    q43: 3,
+    q44: 1,
+    q50: 1
+  });
+
+  harness.setDrunk(false);
+  const overlapResult = harness.computeResult();
+  assert.equal(overlapResult.finalType.code, 'SEEN-ZEN', 'earlier hidden branch should win when multiple hidden personas overlap');
+  assert.equal(overlapResult.secondaryType.code, 'TEST', 'overlap branch should still preserve the best normal secondary type');
+
+  harness.setDrunk(true);
+  const drunkResult = harness.computeResult();
+  assert.equal(drunkResult.finalType.code, 'DRUNK', 'DRUNK should outrank hidden personas');
+  assert.equal(drunkResult.secondaryType.code, 'TEST', 'DRUNK should still preserve the best normal secondary type');
+  assert.equal(drunkResult.modeKicker, '隐藏人格已激活', 'DRUNK should keep the hidden persona kicker');
 });
