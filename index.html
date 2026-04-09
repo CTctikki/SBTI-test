@@ -282,8 +282,8 @@
 
     .promo-qr img {
       width: 100%;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
+      height: auto;
+      display: block;
       border-radius: 16px;
       border: 1px solid rgba(77, 106, 83, 0.12);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
@@ -297,6 +297,19 @@
       color: var(--muted);
       font-size: 13px;
       line-height: 1.7;
+    }
+
+    .promo-qr-fallback {
+      padding-top: 2px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    .promo-qr-fallback a {
+      color: var(--accent-strong);
+      font-weight: 700;
+      text-decoration: none;
     }
 
     button {
@@ -904,6 +917,11 @@
                 <h3>产品福利交流群</h3>
                 <p>扫码加入，获取产品更新、活动福利和创意合作信息。</p>
               </div>
+              <p class="promo-qr-fallback">
+                扫码失效时请前往
+                <a href="https://ctikki.com" target="_blank" rel="noreferrer">ctikki.com</a>
+                获取最新入群方式。
+              </p>
             </aside>
           </div>
         </section>
