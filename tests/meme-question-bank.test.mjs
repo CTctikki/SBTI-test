@@ -40,6 +40,31 @@ function loadFunction(source, functionName) {
   assert.fail(`could not parse ${functionName}`);
 }
 
+function loadFunctionInSandbox(source, functionName, sandbox) {
+  const start = source.indexOf(`function ${functionName}(`);
+  assert.ok(start >= 0, `${functionName} should exist in index.html`);
+
+  const braceStart = source.indexOf('{', start);
+  assert.ok(braceStart >= 0, `${functionName} should have a body`);
+
+  let depth = 0;
+  for (let index = braceStart; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === '{') depth += 1;
+    if (char === '}') {
+      depth -= 1;
+      if (depth === 0) {
+        const functionSource = source.slice(start, index + 1);
+        const context = vm.createContext({ ...sandbox });
+        vm.runInContext(`result = (${functionSource});`, context);
+        return context.result;
+      }
+    }
+  }
+
+  assert.fail(`could not parse ${functionName}`);
+}
+
 function expectedLevel(questionCount, score) {
   const minScore = questionCount;
   const maxScore = questionCount * 3;
@@ -140,4 +165,44 @@ test('reversed meme questions keep their corrected option polarity', () => {
   assert.deepEqual(byId.get('q43').options.map((option) => option.value), [3, 2, 1]);
   assert.deepEqual(byId.get('q45').options.map((option) => option.value), [3, 2, 1]);
   assert.deepEqual(byId.get('q46').options.map((option) => option.value), [3, 2, 1]);
+});
+
+test('computeResult passes per-dimension question counts into sumToLevel', () => {
+  const questions = parseQuestions(html);
+  const dimensionOrder = ['S1', 'S2', 'S3', 'E1', 'E2', 'E3', 'A1', 'A2', 'A3', 'Ac1', 'Ac2', 'Ac3', 'So1', 'So2', 'So3'];
+  const dimensionMeta = Object.fromEntries(dimensionOrder.map((dim) => [dim, { name: dim }]));
+  const questionCounts = Object.fromEntries(
+    dimensionOrder.map((dim) => [dim, questions.filter((question) => question.dim === dim).length])
+  );
+  const calls = [];
+  const answers = Object.fromEntries(questions.map((question) => [question.id, 2]));
+  const computeResult = loadFunctionInSandbox(html, 'computeResult', {
+    questions,
+    dimensionMeta,
+    dimensionOrder,
+    app: { answers },
+    NORMAL_TYPES: [{ code: 'TEST', pattern: 'MMMMMMMMMMMMMMM' }],
+    TYPE_LIBRARY: {
+      TEST: { cn: '测试类型' },
+      DRUNK: { cn: '喝醉类型' },
+      HHHH: { cn: '兜底类型' }
+    },
+    parsePattern: (pattern) => pattern.replace(/-/g, '').split(''),
+    levelNum: (level) => ({ L: 1, M: 2, H: 3 }[level]),
+    sumToLevel: (score, questionCount) => {
+      calls.push({ score, questionCount });
+      return expectedLevel(questionCount ?? 2, score);
+    },
+    getDrunkTriggered: () => false
+  });
+
+  const result = computeResult();
+
+  assert.deepEqual(
+    calls.map((call) => call.questionCount),
+    dimensionOrder.map((dim) => questionCounts[dim]),
+    'computeResult should pass each dimension question count into sumToLevel'
+  );
+  assert.equal(result.levels.So2, 'M');
+  assert.equal(result.bestNormal.code, 'TEST');
 });
