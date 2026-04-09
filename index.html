@@ -255,6 +255,77 @@
       margin-top: 18px;
     }
 
+    .upgrade-panel {
+      width: min(100%, 860px);
+      margin: 18px auto 0;
+      padding: 22px;
+      border-radius: 24px;
+      border: 1px solid rgba(77, 106, 83, 0.12);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 249, 245, 0.98));
+      box-shadow: 0 18px 40px rgba(47, 73, 55, 0.06);
+      text-align: left;
+    }
+
+    .upgrade-kicker {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--accent-strong);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .upgrade-head {
+      margin-top: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .upgrade-title {
+      font-size: clamp(22px, 3vw, 30px);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    .upgrade-copy {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+      max-width: 58ch;
+    }
+
+    .upgrade-list {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .upgrade-item {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+    }
+
+    .upgrade-item strong {
+      display: block;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .upgrade-item span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
     .promo-list {
       display: grid;
       gap: 12px;
@@ -930,6 +1001,7 @@
       }
       .dim-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .studio-grid { grid-template-columns: 1fr; }
+      .upgrade-list { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 600px) {
@@ -945,6 +1017,7 @@
         font-size: 12px;
       }
       .studio-promo { padding: 16px; border-radius: 20px; }
+      .upgrade-panel { padding: 16px; border-radius: 20px; }
       .promo-row {
         flex-direction: column;
         align-items: flex-start;
@@ -1018,6 +1091,28 @@
                 获取最新入群方式。
               </p>
             </aside>
+          </div>
+        </section>
+
+        <section class="upgrade-panel" aria-label="版本升级说明">
+          <span class="upgrade-kicker">VERSION UPGRADE</span>
+          <div class="upgrade-head">
+            <h2 class="upgrade-title">版本升级 / 我们新增了什么</h2>
+            <p class="upgrade-copy">这是一个更适合截图传播的增强版 SBTI，我们先把最能拉开差异的玩法补了上来。</p>
+          </div>
+          <div class="upgrade-list">
+            <article class="upgrade-item">
+              <strong>新增 20 道梗图题目</strong>
+              <span>让测试过程本身更像一张张适合发群的互联网梗图。</span>
+            </article>
+            <article class="upgrade-item">
+              <strong>新增 4 个隐藏人格</strong>
+              <span>稀有结果不再只是一种，更适合拿去截图晒群。</span>
+            </article>
+            <article class="upgrade-item">
+              <strong>结果页新增截图分享文案</strong>
+              <span>测完不只是看结果，还能直接带走更毒、更好转发的成品文案。</span>
+            </article>
           </div>
         </section>
       </div>

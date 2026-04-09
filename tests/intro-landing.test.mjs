@@ -35,6 +35,10 @@ test('intro landing keeps the hero CTA and adds the CT promo block', async () =>
   expectLinkMarkup('https://resume.ctikki.com');
   expectLinkMarkup('https://github.com/CTctikki/SBTI-test');
   assert.ok(html.includes('intro-github-link'));
+  assert.ok(html.includes('版本升级 / 我们新增了什么'));
+  assert.ok(html.includes('新增 20 道梗图题目'));
+  assert.ok(html.includes('新增 4 个隐藏人格'));
+  assert.ok(html.includes('结果页新增截图分享文案'));
   assert.ok(existsSync(qrPath));
   await access(qrPath);
   assert.ok(html.includes('height: auto;'));
