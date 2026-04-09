@@ -141,6 +141,164 @@
       margin-top: 28px;
     }
 
+    a.btn-primary,
+    a.btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .intro-lead {
+      width: min(100%, 720px);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      text-align: center;
+    }
+
+    .intro-author {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .intro-author a {
+      color: var(--accent-strong);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .studio-promo {
+      width: min(100%, 860px);
+      margin: 4px auto 0;
+      padding: 22px;
+      border-radius: 24px;
+      border: 1px solid rgba(77, 106, 83, 0.14);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(241, 247, 242, 0.98));
+      box-shadow: 0 18px 40px rgba(47, 73, 55, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .studio-promo::before {
+      content: "";
+      position: absolute;
+      inset: auto -60px -70px auto;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(108, 141, 113, 0.18), rgba(108, 141, 113, 0));
+      pointer-events: none;
+    }
+
+    .studio-head,
+    .promo-row,
+    .promo-qr {
+      position: relative;
+      z-index: 1;
+    }
+
+    .studio-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .studio-title {
+      font-size: clamp(22px, 3vw, 30px);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    .studio-copy {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+      max-width: 62ch;
+    }
+
+    .studio-cta {
+      white-space: nowrap;
+    }
+
+    .studio-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .promo-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .promo-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .promo-row h3 {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .promo-row p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 34ch;
+    }
+
+    .promo-action {
+      flex: none;
+      min-width: 108px;
+    }
+
+    .promo-qr {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .promo-qr img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 16px;
+      border: 1px solid rgba(77, 106, 83, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    .promo-qr h3 {
+      font-size: 16px;
+    }
+
+    .promo-qr p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
     button {
       border: 0;
       cursor: pointer;
@@ -671,12 +829,26 @@
         grid-template-columns: 1fr;
       }
       .dim-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .studio-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 600px) {
       .shell { padding: 14px 12px 42px; }
       .hero, .test-wrap, .result-wrap { padding: 16px; }
       .hero h1 { font-size: 32px; }
+      .hero-minimal { padding: 24px 16px; }
+      .studio-promo { padding: 16px; border-radius: 20px; }
+      .promo-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .promo-action {
+        width: 100%;
+        min-width: 0;
+      }
+      .promo-action.btn-primary {
+        width: 100%;
+      }
       .question-title { font-size: 15px; }
       .dim-grid,
       .score-grid { grid-template-columns: 1fr; }
@@ -687,22 +859,54 @@
   <div class="shell">
     <section id="intro" class="screen active">
       <div class="hero card hero-minimal">
-        <h1>MBTI已经过时，SBTI来了。</h1>
-        <div class="hero-actions hero-actions-single">
-          <button id="startBtn" class="btn-primary">开始测试</button>
+        <div class="intro-lead">
+          <h1>MBTI已经过时，SBTI来了。</h1>
+          <div class="hero-actions hero-actions-single">
+            <button id="startBtn" class="btn-primary">开始测试</button>
+          </div>
+          <div class="intro-author">
+            <span>
+              原作者：
+              <a href="https://space.bilibili.com/417038183" target="_blank" rel="noreferrer">B站@蛆肉儿串儿</a>
+            </span>
+          </div>
         </div>
-        <div style="padding-top: 2rem; display: flex; flex-direction: column;">
-          <span>
-            原作者：
-            <a href="https://space.bilibili.com/417038183">B站@蛆肉儿串儿</a>
-          </span>
-          <span>
-            托管：Cloudflare (免费)
-          </span>
-          <span>
-            域名：Spaceship (自费)
-          </span>
-        </div>
+        <section class="studio-promo" aria-label="CT 程序定制工作室推广">
+          <div class="studio-head">
+            <div>
+              <h2 class="studio-title">CT 程序定制工作室</h2>
+              <p class="studio-copy">
+                我们把 AI 工具、网站、原型和效率应用，做成更顺手、更耐看的产品。
+              </p>
+            </div>
+            <a class="btn-primary studio-cta" href="https://ctikki.com" target="_blank" rel="noreferrer">前往官网</a>
+          </div>
+          <div class="studio-grid">
+            <div class="promo-list">
+              <article class="promo-row">
+                <div>
+                  <h3>AI 八字算命</h3>
+                  <p>把传统命理体验包装成更轻量的 AI 产品入口。</p>
+                </div>
+                <a class="btn-primary promo-action" href="https://bazi.ctikki.com" target="_blank" rel="noreferrer">立即前往</a>
+              </article>
+              <article class="promo-row">
+                <div>
+                  <h3>AI 简历制作</h3>
+                  <p>快速生成更清爽的简历页面和可分享的作品结果。</p>
+                </div>
+                <a class="btn-primary promo-action" href="https://resume.ctikki.com" target="_blank" rel="noreferrer">立即前往</a>
+              </article>
+            </div>
+            <aside class="promo-qr">
+              <img src="image/community-group-qr.jpg" alt="产品福利交流群二维码" />
+              <div>
+                <h3>产品福利交流群</h3>
+                <p>扫码加入，获取产品更新、活动福利和创意合作信息。</p>
+              </div>
+            </aside>
+          </div>
+        </section>
       </div>
     </section>
 
