@@ -149,6 +149,24 @@
       text-decoration: none;
     }
 
+    .intro-github-link {
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      z-index: 3;
+      min-height: 42px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(77, 106, 83, 0.16);
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 12px 28px rgba(47, 73, 55, 0.08);
+      color: var(--accent-strong);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      backdrop-filter: blur(8px);
+    }
+
     .intro-lead {
       width: min(100%, 720px);
       margin: 0 auto;
@@ -867,6 +885,13 @@
       .hero, .test-wrap, .result-wrap { padding: 16px; }
       .hero h1 { font-size: 32px; }
       .hero-minimal { padding: 24px 16px; }
+      .intro-github-link {
+        top: 14px;
+        right: 14px;
+        min-height: 36px;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
       .studio-promo { padding: 16px; border-radius: 20px; }
       .promo-row {
         flex-direction: column;
@@ -889,6 +914,7 @@
   <div class="shell">
     <section id="intro" class="screen active">
       <div class="hero card hero-minimal">
+        <a class="btn-secondary intro-github-link" href="https://github.com/CTctikki/SBTI-test" target="_blank" rel="noreferrer">GitHub</a>
         <div class="intro-lead">
           <h1>MBTI已经过时，SBTI来了。</h1>
           <div class="hero-actions hero-actions-single">

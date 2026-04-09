@@ -33,6 +33,8 @@ test('intro landing keeps the hero CTA and adds the CT promo block', async () =>
   expectLinkMarkup('https://ctikki.com');
   expectLinkMarkup('https://bazi.ctikki.com');
   expectLinkMarkup('https://resume.ctikki.com');
+  expectLinkMarkup('https://github.com/CTctikki/SBTI-test');
+  assert.ok(html.includes('intro-github-link'));
   assert.ok(existsSync(qrPath));
   await access(qrPath);
   assert.ok(html.includes('height: auto;'));
