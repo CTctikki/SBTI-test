@@ -683,6 +683,23 @@
     .poster-box.no-image .poster-image {
       display: none;
     }
+    .poster-status {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      position: relative;
+      z-index: 1;
+    }
+    .poster-status.error {
+      color: #8c4e3f;
+    }
+    .poster-retry {
+      margin-top: 12px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
     .poster-caption {
       margin-top: 14px;
       color: var(--muted);
@@ -955,6 +972,8 @@
             <div class="poster-box" id="posterBox">
               <img id="posterImage" class="poster-image" alt="人格结果图" />
               <div id="posterCaption" class="poster-caption">怎么样，被我拿捏了吧？</div>
+              <div id="posterStatus" class="poster-status" hidden aria-live="polite"></div>
+              <button id="retryPosterBtn" class="btn-secondary poster-retry" type="button" hidden>重试加载图片</button>
             </div>
 
             <div class="type-box">
@@ -1712,6 +1731,73 @@
     const progressText = document.getElementById('progressText');
     const submitBtn = document.getElementById('submitBtn');
     const testHint = document.getElementById('testHint');
+    const posterBox = document.getElementById('posterBox');
+    const posterImage = document.getElementById('posterImage');
+    const posterStatus = document.getElementById('posterStatus');
+    const retryPosterBtn = document.getElementById('retryPosterBtn');
+
+    function resetPosterFeedback() {
+      posterStatus.hidden = true;
+      posterStatus.textContent = '';
+      posterStatus.classList.remove('error');
+      retryPosterBtn.hidden = true;
+      retryPosterBtn.onclick = null;
+      posterBox.classList.remove('no-image', 'image-error');
+    }
+
+    function showPosterFallback(message, retryFn = null) {
+      posterStatus.textContent = message;
+      posterStatus.hidden = false;
+      posterStatus.classList.add('error');
+      retryPosterBtn.hidden = !retryFn;
+      retryPosterBtn.onclick = retryFn;
+      posterBox.classList.add('no-image', 'image-error');
+    }
+
+    function loadPosterImage(type, attempt = 0) {
+      const imageSrc = TYPE_IMAGES[type.code];
+      const posterAlt = `${type.code}（${type.cn}）`;
+
+      resetPosterFeedback();
+
+      if (!imageSrc) {
+        posterImage.removeAttribute('src');
+        posterImage.alt = '';
+        showPosterFallback('该结果图暂时不可用，请稍后再试。');
+        return;
+      }
+
+      const preload = new Image();
+      const requestId = `${type.code}:${attempt}:${Date.now()}`;
+      const resolvedSrc = attempt === 0
+        ? imageSrc
+        : `${imageSrc}${imageSrc.includes('?') ? '&' : '?'}retry=${Date.now()}`;
+
+      posterBox.dataset.posterRequestId = requestId;
+
+      preload.onload = () => {
+        if (posterBox.dataset.posterRequestId !== requestId) return;
+        posterImage.src = preload.src;
+        posterImage.alt = posterAlt;
+        posterBox.classList.remove('no-image', 'image-error');
+      };
+
+      preload.onerror = () => {
+        if (posterBox.dataset.posterRequestId !== requestId) return;
+        if (attempt === 0) {
+          loadPosterImage(type, 1);
+          return;
+        }
+        posterImage.removeAttribute('src');
+        posterImage.alt = posterAlt;
+        showPosterFallback(
+          '图片加载失败，请点下方按钮重试；若仍异常，刷新页面后再试。',
+          () => loadPosterImage(type, 0)
+        );
+      };
+
+      preload.src = resolvedSrc;
+    }
 
     function showScreen(name) {
       Object.entries(screens).forEach(([key, el]) => {
@@ -1927,18 +2013,7 @@
         ? '本测试仅供娱乐。隐藏人格和傻乐兜底都属于作者故意埋的损招，请勿把它当成医学、心理学、相学、命理学或灵异学依据。'
         : '本测试仅供娱乐，别拿它当诊断、面试、相亲、分手、招魂、算命或人生判决书。你可以笑，但别太当真。';
 
-      const posterBox = document.getElementById('posterBox');
-      const posterImage = document.getElementById('posterImage');
-      const imageSrc = TYPE_IMAGES[type.code];
-      if (imageSrc) {
-        posterImage.src = imageSrc;
-        posterImage.alt = `${type.code}（${type.cn}）`;
-        posterBox.classList.remove('no-image');
-      } else {
-        posterImage.removeAttribute('src');
-        posterImage.alt = '';
-        posterBox.classList.add('no-image');
-      }
+      loadPosterImage(type);
 
       renderDimList(result);
       showScreen('result');
