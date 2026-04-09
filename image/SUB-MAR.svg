@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" role="img" aria-labelledby="title desc">
+  <title id="title">SUB-MAR / 群聊核潜艇</title>
+  <desc id="desc">你不是不在线，你只是不打算浮出水面。群聊里最安静的人，往往在心里已经吐槽完一整套。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f4fbff"/>
+      <stop offset="100%" stop-color="#d8e8ef"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1600" fill="url(#bg)"/>
+  <rect x="72" y="72" width="1056" height="1456" rx="40" fill="none" stroke="#6e91a1" stroke-width="6"/>
+  <text x="108" y="180" fill="#204150" font-family="sans-serif" font-size="64" font-weight="700">SUB-MAR</text>
+  <text x="108" y="270" fill="#204150" font-family="sans-serif" font-size="54" font-weight="700">群聊核潜艇</text>
+  <text x="108" y="420" fill="#325260" font-family="sans-serif" font-size="42">
+    <tspan x="108" dy="0">你不是不在线，你只是不打算浮出水面。</tspan>
+    <tspan x="108" dy="84">群聊里最安静的人，往往在心里已经吐槽完一整套。</tspan>
+  </text>
+  <text x="108" y="1240" fill="#486473" font-family="sans-serif" font-size="30">SBTI hidden persona poster</text>
+</svg>

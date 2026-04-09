@@ -1805,6 +1805,50 @@
     "shareHook": "把这张图发出去，看看谁会第一个说“这就是你”。",
     "shareTags": ["#野生脑回路", "#系统笑出声", "#SBTI测试"]
   },
+  "SEEN-ZEN": {
+    "code": "SEEN-ZEN",
+    "cn": "已读不回仙人",
+    "intro": "消息我看了，回复我再想想。",
+    "desc": "恭喜您，您触发了隐藏人格【已读不回仙人】。您不是不在乎，只是每次社交都像在做一道高压选择题。您的核心天赋不是聊天，而是把“待回复”修炼成一种稳定气场。别人焦虑于回得慢，您焦虑于一旦开始回复，就等于批准整场对话继续扩建。",
+    "shareTitle": "你不是普通装死，你是已读不回仙人限定款",
+    "shareRoast": "消息你看到了，只是还没打算让别人知道你看到了。",
+    "shareCaption": "测出已读不回仙人后，我终于承认自己不是忙，我是回消息过敏。",
+    "shareHook": "发给那个回消息永远像在走审批流的朋友。",
+    "shareTags": ["#已读不回文学", "#社交逃逸赛道", "#SBTI测试"]
+  },
+  "DEL-ART": {
+    "code": "DEL-ART",
+    "cn": "深夜删文艺术家",
+    "intro": "发出去之前先后悔，后悔之前先共鸣。",
+    "desc": "您触发了隐藏人格【深夜删文艺术家】。您不是没话说，您是太知道一句话发出去后会在自己脑内循环播放多久。白天您是体面人，夜里您是撤回与共情同时发生的艺术装置。每一条删掉的小作文，都是您给互联网留过的情书草稿。",
+    "shareTitle": "你不是普通敏感，你是深夜删文艺术家限定款",
+    "shareRoast": "你不是表达欲低，你是每次表达都先经过三轮自我审判。",
+    "shareCaption": "测完这个人格，我开始怀疑我的撤回键是不是被我按出包浆了。",
+    "shareHook": "把这张图发给那个最爱深夜发了又删的人。",
+    "shareTags": ["#深夜删文人格", "#撤回键重度用户", "#SBTI测试"]
+  },
+  "FOUNDR": {
+    "code": "FOUNDR",
+    "cn": "收藏夹创业者",
+    "intro": "灵感很多，落地之前先整理桌面。",
+    "desc": "您触发了隐藏人格【收藏夹创业者】。您的大脑不是没有项目，而是项目多到每一个都在排队等您宠幸。您擅长在凌晨两点看完十篇方法论，顺手收藏二十条灵感，然后在真正开始之前，先认真挑一款最好看的 Notion 模板。",
+    "shareTitle": "你不是普通想做事，你是收藏夹创业者限定款",
+    "shareRoast": "你离成功只差一步，那一步叫真正开始。",
+    "shareCaption": "我不是没灵感，我只是把灵感全堆在收藏夹里养蛊了。",
+    "shareHook": "发给那个天天想做项目但永远先改桌面的人。",
+    "shareTags": ["#收藏夹创业者", "#灵感囤积症", "#SBTI测试"]
+  },
+  "SUB-MAR": {
+    "code": "SUB-MAR",
+    "cn": "群聊核潜艇",
+    "intro": "你不是不在线，你只是不打算浮出水面。",
+    "desc": "您触发了隐藏人格【群聊核潜艇】。您不是没有存在感，您只是把存在感全都留在脑内独播。您会阅读、理解、判断、吐槽、共鸣，但就是不打那行字。别人以为您安静，实际上您已经在心里参与完了整场辩论并且赢了。",
+    "shareTitle": "你不是普通潜水，你是群聊核潜艇限定款",
+    "shareRoast": "群里你最安静，心里你已经发了 18 条。",
+    "shareCaption": "测出群聊核潜艇后，我承认我才是那个永远在场却从不出声的人。",
+    "shareHook": "把这张图发给那个群里潜到能长出珊瑚的朋友。",
+    "shareTags": ["#群聊核潜艇", "#潜水但在线", "#SBTI测试"]
+  },
   "DRUNK": {
     "code": "DRUNK",
     "cn": "酒鬼",
@@ -1829,6 +1873,10 @@
   "FUCK": "./image/FUCK.png",
   "CTRL": "./image/CTRL.png",
   "HHHH": "./image/HHHH.png",
+  "SEEN-ZEN": "./image/SEEN-ZEN.svg",
+  "DEL-ART": "./image/DEL-ART.svg",
+  "FOUNDR": "./image/FOUNDR.svg",
+  "SUB-MAR": "./image/SUB-MAR.svg",
   "SEXY": "./image/SEXY.png",
   "OJBK": "./image/OJBK.png",
   "JOKE-R": "./image/JOKE-R.jpg",
@@ -2225,6 +2273,22 @@
       return pattern.replace(/-/g, '').split('');
     }
 
+    function getSeenZenTriggered() {
+      return app.answers.q31 === 1 && app.answers.q32 === 1 && app.answers.q43 === 1;
+    }
+
+    function getDeleteArtistTriggered() {
+      return app.answers.q32 === 1 && app.answers.q37 === 1 && app.answers.q50 === 1;
+    }
+
+    function getFoundrTriggered() {
+      return app.answers.q33 === 1 && app.answers.q42 === 2 && app.answers.q49 === 1;
+    }
+
+    function getSubMarTriggered() {
+      return app.answers.q31 === 1 && app.answers.q43 === 1 && app.answers.q44 === 1;
+    }
+
     function getDrunkTriggered() {
       return app.answers[DRUNK_TRIGGER_QUESTION_ID] === 2;
     }
@@ -2263,7 +2327,11 @@
       });
 
       const bestNormal = ranked[0];
-      const drunkTriggered = getDrunkTriggered();
+      const drunkTriggered = typeof getDrunkTriggered === 'function' && getDrunkTriggered();
+      const seenZenTriggered = typeof getSeenZenTriggered === 'function' && getSeenZenTriggered();
+      const deleteArtistTriggered = typeof getDeleteArtistTriggered === 'function' && getDeleteArtistTriggered();
+      const foundrTriggered = typeof getFoundrTriggered === 'function' && getFoundrTriggered();
+      const subMarTriggered = typeof getSubMarTriggered === 'function' && getSubMarTriggered();
 
       let finalType;
       let modeKicker = '你的主类型';
@@ -2278,6 +2346,34 @@
         modeKicker = '隐藏人格已激活';
         badge = '匹配度 100% · 酒精异常因子已接管';
         sub = '乙醇亲和性过强，系统已直接跳过常规人格审判。';
+        special = true;
+      } else if (seenZenTriggered) {
+        finalType = TYPE_LIBRARY['SEEN-ZEN'];
+        secondaryType = bestNormal;
+        modeKicker = '隐藏人格已激活';
+        badge = '隐藏人格 · 已读不回仙人';
+        sub = '消息我看了，回复我再想想。';
+        special = true;
+      } else if (deleteArtistTriggered) {
+        finalType = TYPE_LIBRARY['DEL-ART'];
+        secondaryType = bestNormal;
+        modeKicker = '隐藏人格已激活';
+        badge = '隐藏人格 · 深夜删文艺术家';
+        sub = '发出去之前先后悔，后悔之前先共鸣。';
+        special = true;
+      } else if (foundrTriggered) {
+        finalType = TYPE_LIBRARY['FOUNDR'];
+        secondaryType = bestNormal;
+        modeKicker = '隐藏人格已激活';
+        badge = '隐藏人格 · 收藏夹创业者';
+        sub = '灵感很多，落地之前先整理桌面。';
+        special = true;
+      } else if (subMarTriggered) {
+        finalType = TYPE_LIBRARY['SUB-MAR'];
+        secondaryType = bestNormal;
+        modeKicker = '隐藏人格已激活';
+        badge = '隐藏人格 · 群聊核潜艇';
+        sub = '你不是不在线，你只是不打算浮出水面。';
         special = true;
       } else if (bestNormal.similarity < 60) {
         finalType = TYPE_LIBRARY.HHHH;
