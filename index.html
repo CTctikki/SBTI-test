@@ -2136,12 +2136,13 @@
     }
 
     function buildShareMeta(type) {
+      const hasCustomTags = Array.isArray(type.shareTags) && type.shareTags.length >= 2;
       return {
-        title: type.shareTitle || '',
-        roast: type.shareRoast || '',
-        caption: type.shareCaption || '',
-        hook: type.shareHook || '',
-        tags: Array.isArray(type.shareTags) ? type.shareTags : []
+        title: type.shareTitle || `你不是普通的${type.cn}，你是默认分享款`,
+        roast: type.shareRoast || '这张结果还没写专属黑话，但它已经足够说明你很有戏。',
+        caption: type.shareCaption || `测出 ${type.code} 的那一刻，我已经想把它截图发出去了。`,
+        hook: type.shareHook || '把这张图发给那个最懂你的人，看他怎么接招。',
+        tags: hasCustomTags ? type.shareTags : ['#默认分享款', '#SBTI测试']
       };
     }
 

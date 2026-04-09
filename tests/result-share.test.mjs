@@ -17,6 +17,15 @@ function parseObjectLiteral(source, name) {
   return Function(`return ({${match[1]}\n});`)();
 }
 
+function loadNamedFunction(source, name, nextName) {
+  const start = source.indexOf(`function ${name}(type) {`);
+  assert.ok(start >= 0, `${name} should exist in index.html`);
+  const end = source.indexOf(`function ${nextName}(type) {`, start);
+  assert.ok(end > start, `${nextName} should follow ${name} in index.html`);
+  const fnSource = source.slice(start, end).trimEnd();
+  return Function(`${fnSource}; return ${name};`)();
+}
+
 test('result page exposes share fields and helpers', () => {
   for (const id of requiredIds) {
     assert.match(html, new RegExp(`id="${id}"`), `expected ${id} to exist`);
@@ -27,7 +36,7 @@ test('result page exposes share fields and helpers', () => {
   assert.match(html, /renderShareMeta\(type\)/, 'expected renderResult to call renderShareMeta');
 });
 
-test('TYPE_LIBRARY includes share metadata for the core meme personas', () => {
+test('TYPE_LIBRARY core personas keep their approved share metadata', () => {
   const typeLibrary = parseObjectLiteral(html, 'TYPE_LIBRARY');
 
   for (const code of requiredCodes) {
@@ -39,5 +48,29 @@ test('TYPE_LIBRARY includes share metadata for the core meme personas', () => {
     assert.equal(typeof entry.shareHook, 'string', `${code}.shareHook should be a string`);
     assert.ok(Array.isArray(entry.shareTags), `${code}.shareTags should be an array`);
     assert.ok(entry.shareTags.length >= 2, `${code}.shareTags should include at least 2 tags`);
+  }
+});
+
+test('buildShareMeta provides usable share copy for every TYPE_LIBRARY entry', () => {
+  const typeLibrary = parseObjectLiteral(html, 'TYPE_LIBRARY');
+  const buildShareMeta = loadNamedFunction(html, 'buildShareMeta', 'renderShareMeta');
+
+  for (const [code, type] of Object.entries(typeLibrary)) {
+    const shareMeta = buildShareMeta(type);
+
+    assert.equal(typeof shareMeta.title, 'string', `${code}.title should be a string`);
+    assert.ok(shareMeta.title.trim(), `${code}.title should not be empty`);
+    assert.equal(typeof shareMeta.roast, 'string', `${code}.roast should be a string`);
+    assert.ok(shareMeta.roast.trim(), `${code}.roast should not be empty`);
+    assert.equal(typeof shareMeta.caption, 'string', `${code}.caption should be a string`);
+    assert.ok(shareMeta.caption.trim(), `${code}.caption should not be empty`);
+    assert.equal(typeof shareMeta.hook, 'string', `${code}.hook should be a string`);
+    assert.ok(shareMeta.hook.trim(), `${code}.hook should not be empty`);
+    assert.ok(Array.isArray(shareMeta.tags), `${code}.tags should be an array`);
+    assert.ok(shareMeta.tags.length >= 2, `${code}.tags should include at least 2 tags`);
+    for (const tag of shareMeta.tags) {
+      assert.equal(typeof tag, 'string', `${code}.tags entries should be strings`);
+      assert.ok(tag.trim(), `${code}.tags entries should not be empty`);
+    }
   }
 });
