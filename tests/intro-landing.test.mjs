@@ -50,7 +50,9 @@ test('intro landing keeps the hero CTA and adds the CT promo block', async () =>
   );
   assert.ok(existsSync(qrPath));
   await access(qrPath);
-  assert.ok(html.includes('height: auto;'));
-  assert.ok(!html.includes('aspect-ratio: 1 / 1;'));
-  assert.ok(!html.includes('object-fit: cover;'));
+  const promoQrCss = html.match(/\.promo-qr img\s*\{([\s\S]*?)\}/);
+  assert.ok(promoQrCss, 'expected promo QR image CSS block to exist');
+  assert.ok(promoQrCss[1].includes('height: auto;'));
+  assert.ok(!promoQrCss[1].includes('aspect-ratio: 1 / 1;'));
+  assert.ok(!promoQrCss[1].includes('object-fit: cover;'));
 });

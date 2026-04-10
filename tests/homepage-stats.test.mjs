@@ -302,6 +302,7 @@ function formatRankingTotal(count) {
 
 test('homepage stats config and renderer exist with the approved data', () => {
   const stats = parseConstObject(html, 'HOMEPAGE_STATS');
+  const typeImages = parseConstObject(html, 'TYPE_IMAGES');
 
   assert.equal(stats.completedCount, 12631, 'expected HOMEPAGE_STATS.completedCount to be 12631');
   assert.ok(Array.isArray(stats.popularRankings), 'expected HOMEPAGE_STATS.popularRankings to exist');
@@ -342,6 +343,7 @@ test('homepage stats config and renderer exist with the approved data', () => {
 
   const renderHomepageStats = loadFunctionInSandbox(html, 'renderHomepageStats', {
     HOMEPAGE_STATS: stats,
+    TYPE_IMAGES: typeImages,
     document: {
       getElementById(id) {
         return nodes[id] ?? null;
@@ -399,11 +401,23 @@ test('homepage stats config and renderer exist with the approved data', () => {
 
     cursor = percentageIndex + percentage.length;
   }
+
+  assert.ok(
+    rankingOutput.includes('ranking-thumb'),
+    'expected renderHomepageStats() to render ranking thumbnails',
+  );
+  for (const code of expectedRankings.map((item) => item.code)) {
+    assert.ok(
+      rankingOutput.includes(typeImages[code]),
+      `expected ranking output to include image for ${code}`,
+    );
+  }
 });
 
 test('homepage stats render during real startup', () => {
   const script = extractScriptBlock(html);
   const stats = parseConstObject(html, 'HOMEPAGE_STATS');
+  const typeImages = parseConstObject(html, 'TYPE_IMAGES');
   const nodes = {
     intro: createDomNode({ tagName: 'SECTION' }),
     test: createDomNode({ tagName: 'SECTION' }),
@@ -442,6 +456,7 @@ test('homepage stats render during real startup', () => {
   const context = vm.createContext({
     console,
     HOMEPAGE_STATS: stats,
+    TYPE_IMAGES: typeImages,
     document: {
       getElementById(id) {
         return nodes[id] ?? createDomNode();
@@ -477,6 +492,10 @@ test('homepage stats render during real startup', () => {
   assert.ok(
     nodes.rankingList.innerHTML.includes('LOVE-R'),
     'expected the real startup path to render the ranking list',
+  );
+  assert.ok(
+    nodes.rankingList.innerHTML.includes('ranking-thumb'),
+    'expected the real startup path to render ranking thumbnails',
   );
   assert.ok(
     nodes.startBtn.listeners?.click?.length > 0,

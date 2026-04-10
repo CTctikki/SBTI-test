@@ -116,9 +116,12 @@ const hiddenPersonas = [
 ];
 
 test('hidden persona assets, helpers, and codes are wired into the app', () => {
+  const typeImages = parseObjectLiteral(html, 'TYPE_IMAGES');
+
   for (const code of hiddenPersonas.map((persona) => persona.code)) {
     assert.match(html, new RegExp(code), `expected ${code} to be present in index.html`);
-    assert.equal(existsSync(path.join(rootDir, 'image', `${code}.svg`)), true, `expected image/${code}.svg to exist`);
+    assert.equal(existsSync(path.join(rootDir, 'image', `${code}.png`)), true, `expected image/${code}.png to exist`);
+    assert.equal(typeImages[code], `./image/${code}.png`, `expected TYPE_IMAGES to use PNG for ${code}`);
   }
 
   for (const { helper } of hiddenPersonas) {

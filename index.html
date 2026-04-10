@@ -300,8 +300,26 @@
     .ranking-item-top {
       display: flex;
       align-items: flex-start;
-      justify-content: space-between;
       gap: 14px;
+    }
+
+    .ranking-identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .ranking-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      object-fit: cover;
+      border: 1px solid rgba(77, 106, 83, 0.12);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 10px 20px rgba(47, 73, 55, 0.08);
+      flex-shrink: 0;
     }
 
     .ranking-rank {
@@ -323,7 +341,6 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      flex: 1;
       min-width: 0;
     }
 
@@ -2177,10 +2194,10 @@
   "FUCK": "./image/FUCK.png",
   "CTRL": "./image/CTRL.png",
   "HHHH": "./image/HHHH.png",
-  "SEEN-ZEN": "./image/SEEN-ZEN.svg",
-  "DEL-ART": "./image/DEL-ART.svg",
-  "FOUNDR": "./image/FOUNDR.svg",
-  "SUB-MAR": "./image/SUB-MAR.svg",
+  "SEEN-ZEN": "./image/SEEN-ZEN.png",
+  "DEL-ART": "./image/DEL-ART.png",
+  "FOUNDR": "./image/FOUNDR.png",
+  "SUB-MAR": "./image/SUB-MAR.png",
   "SEXY": "./image/SEXY.png",
   "OJBK": "./image/OJBK.png",
   "JOKE-R": "./image/JOKE-R.jpg",
@@ -2811,13 +2828,17 @@
 
       rankingList.innerHTML = HOMEPAGE_STATS.popularRankings.map((item, index) => {
         const barWidth = Number.parseFloat(item.percentage) || 0;
+        const imageSrc = TYPE_IMAGES[item.code];
         return `
           <article class="ranking-item">
             <div class="ranking-item-top">
               <span class="ranking-rank">${String(index + 1).padStart(2, '0')}</span>
-              <div class="ranking-name">
-                <strong>${item.cn}</strong>
-                <span>${item.code}</span>
+              <div class="ranking-identity">
+                ${imageSrc ? `<img class="ranking-thumb" src="${imageSrc}" alt="${item.code} ${item.cn}" />` : ''}
+                <div class="ranking-name">
+                  <strong>${item.cn}</strong>
+                  <span>${item.code}</span>
+                </div>
               </div>
               <div class="ranking-percent">${item.percentage}</div>
             </div>
