@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -36,13 +37,61 @@ function loadFunctionSource(source, name) {
   assert.fail(`could not parse ${name} helper`);
 }
 
-function requireSnippet(haystack, needle, message) {
-  if (needle instanceof RegExp) {
-    assert.ok(needle.test(haystack), message);
-    return;
-  }
+function loadFunctionInSandbox(source, name, sandbox) {
+  const functionSource = loadFunctionSource(source, name);
+  const context = vm.createContext({ ...sandbox });
+  vm.runInContext(`result = (${functionSource});`, context);
+  return context.result;
+}
 
-  assert.ok(haystack.includes(needle), message);
+function createDomNode(initial = {}) {
+  const node = {
+    textContent: initial.textContent ?? '',
+    innerHTML: initial.innerHTML ?? '',
+    className: initial.className ?? '',
+    children: [],
+    parentNode: null,
+    style: {},
+    dataset: {},
+    classList: {
+      add(...classes) {
+        node.className = [node.className, ...classes].filter(Boolean).join(' ').trim();
+      },
+      remove(...classes) {
+        const removals = new Set(classes);
+        node.className = node.className
+          .split(/\s+/)
+          .filter((className) => className && !removals.has(className))
+          .join(' ');
+      },
+      contains(className) {
+        return node.className.split(/\s+/).includes(className);
+      },
+    },
+    setAttribute(name, value) {
+      this[name] = value;
+    },
+    getAttribute(name) {
+      return this[name];
+    },
+    appendChild(child) {
+      child.parentNode = this;
+      this.children.push(child);
+      return child;
+    },
+    insertAdjacentHTML(position, htmlSnippet) {
+      this.lastInsert = { position, htmlSnippet };
+      this.innerHTML = `${this.innerHTML}${htmlSnippet}`;
+    },
+    querySelector() {
+      return null;
+    },
+    querySelectorAll() {
+      return [];
+    },
+  };
+
+  return node;
 }
 
 test('homepage stats config and renderer exist with the approved data', () => {
@@ -78,32 +127,75 @@ test('homepage stats config and renderer exist with the approved data', () => {
     );
   }
 
-  const renderHomepageStats = loadFunctionSource(html, 'renderHomepageStats');
-  assert.match(renderHomepageStats, /\bHOMEPAGE_STATS\b/, 'expected renderHomepageStats() to use HOMEPAGE_STATS');
-  assert.match(renderHomepageStats, /\bintroStatsLine\b/, 'expected renderHomepageStats() to render the intro stats line');
-  assert.match(renderHomepageStats, /\brankingTotal\b/, 'expected renderHomepageStats() to render the ranking total');
-  assert.match(renderHomepageStats, /\brankingList\b/, 'expected renderHomepageStats() to render the ranking list');
+  const nodes = {
+    introStatsLine: createDomNode(),
+    rankingTotal: createDomNode(),
+    rankingList: createDomNode(),
+    rankingPanel: createDomNode({ className: 'ranking-panel' }),
+  };
+
+  const renderHomepageStats = loadFunctionInSandbox(html, 'renderHomepageStats', {
+    HOMEPAGE_STATS: stats,
+    document: {
+      getElementById(id) {
+        return nodes[id] ?? null;
+      },
+      querySelector(selector) {
+        if (selector === '#introStatsLine') return nodes.introStatsLine;
+        if (selector === '#rankingTotal') return nodes.rankingTotal;
+        if (selector === '#rankingList') return nodes.rankingList;
+        if (selector === '.ranking-panel') return nodes.rankingPanel;
+        return null;
+      },
+      querySelectorAll() {
+        return [];
+      },
+    },
+    window: {},
+  });
+
+  renderHomepageStats();
+
+  assert.equal(
+    nodes.introStatsLine.textContent,
+    '已有 12,631 人完成测试',
+    'expected renderHomepageStats() to populate the intro stats line',
+  );
+  assert.equal(
+    nodes.rankingTotal.textContent,
+    '12,631 人已测',
+    'expected renderHomepageStats() to populate the ranking total',
+  );
+  assert.ok(
+    nodes.rankingList.innerHTML.includes('LOVE-R'),
+    'expected renderHomepageStats() to render the top-10 ranking list',
+  );
+  assert.ok(
+    nodes.rankingList.innerHTML.includes('11.7%'),
+    'expected renderHomepageStats() to render ranking percentages',
+  );
 });
 
 test('homepage stats markup is scoped to the dedicated stats block', () => {
-  requireSnippet(html, 'id="introStatsLine"', 'expected introStatsLine markup to exist');
-  requireSnippet(html, 'id="rankingTotal"', 'expected rankingTotal markup to exist');
-  requireSnippet(html, 'id="rankingList"', 'expected rankingList markup to exist');
-  requireSnippet(html, 'class="ranking-panel"', 'expected ranking-panel markup to exist');
+  const introSectionMatch = html.match(
+    /<div class="hero card hero-minimal">([\s\S]*?<section class="studio-promo"[\s\S]*?<\/section>)/,
+  );
+  assert.ok(introSectionMatch, 'expected intro section markup slice to exist');
 
-  const upgradePanel = html.indexOf('upgrade-panel');
-  const rankingPanel = html.indexOf('ranking-panel');
-  const studioPromo = html.indexOf('studio-promo');
+  const introSection = introSectionMatch[1];
+  const upgradePanel = introSection.indexOf('upgrade-panel');
+  const rankingPanel = introSection.indexOf('ranking-panel');
+  const studioPromo = introSection.indexOf('studio-promo');
 
-  assert.ok(upgradePanel >= 0, 'expected upgrade-panel markup to exist');
-  assert.ok(rankingPanel >= 0, 'expected ranking-panel markup to exist');
-  assert.ok(studioPromo >= 0, 'expected studio-promo markup to exist');
+  assert.ok(upgradePanel >= 0, 'expected upgrade-panel markup to exist in the intro section');
+  assert.ok(rankingPanel >= 0, 'expected ranking-panel markup to exist in the intro section');
+  assert.ok(studioPromo >= 0, 'expected studio-promo markup to exist in the intro section');
   assert.ok(
     upgradePanel < rankingPanel,
-    'expected the ranking panel to appear after the version upgrade panel',
+    'expected the ranking panel to appear after the version upgrade panel within the intro section',
   );
   assert.ok(
     rankingPanel < studioPromo,
-    'expected the ranking panel to appear before the CT 程序定制工作室 block',
+    'expected the ranking panel to appear before the CT 程序定制工作室 block within the intro section',
   );
 });
