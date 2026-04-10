@@ -39,6 +39,10 @@ test('intro landing keeps the hero CTA and adds the CT promo block', async () =>
   assert.ok(html.includes('新增 20 道梗图题目'));
   assert.ok(html.includes('新增 4 个隐藏人格'));
   assert.ok(html.includes('结果页新增截图分享文案'));
+  assert.ok(
+    html.indexOf('版本升级 / 我们新增了什么') < html.indexOf('CT 程序定制工作室'),
+    'expected the upgrade panel to appear before the studio promo'
+  );
   assert.ok(existsSync(qrPath));
   await access(qrPath);
   assert.ok(html.includes('height: auto;'));
