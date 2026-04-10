@@ -192,6 +192,188 @@
       text-decoration: none;
     }
 
+    .intro-stats-line {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(108, 141, 113, 0.18);
+      background: rgba(237, 246, 239, 0.92);
+      color: var(--accent-strong);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      box-shadow: 0 10px 22px rgba(47, 73, 55, 0.06);
+    }
+
+    .ranking-panel {
+      width: min(100%, 860px);
+      margin: 18px auto 0;
+      padding: 22px;
+      border-radius: 24px;
+      border: 1px solid rgba(77, 106, 83, 0.12);
+      background:
+        radial-gradient(circle at top right, rgba(108, 141, 113, 0.08), rgba(108, 141, 113, 0) 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 249, 245, 0.98));
+      box-shadow: 0 18px 40px rgba(47, 73, 55, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ranking-panel::before {
+      content: "";
+      position: absolute;
+      inset: auto -70px -80px auto;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(108, 141, 113, 0.16), rgba(108, 141, 113, 0));
+      pointer-events: none;
+    }
+
+    .ranking-head,
+    .ranking-list {
+      position: relative;
+      z-index: 1;
+    }
+
+    .ranking-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .ranking-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--accent-strong);
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+      letter-spacing: 0.04em;
+    }
+
+    .ranking-title {
+      font-size: clamp(22px, 3vw, 30px);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    .ranking-total {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(108, 141, 113, 0.18);
+      background: rgba(237, 246, 239, 0.9);
+      color: var(--accent-strong);
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 22px rgba(47, 73, 55, 0.06);
+      white-space: nowrap;
+    }
+
+    .ranking-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .ranking-item {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(77, 106, 83, 0.1);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 249, 245, 0.94));
+      box-shadow: 0 12px 24px rgba(47, 73, 55, 0.04);
+    }
+
+    .ranking-item-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .ranking-rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 38px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--accent-strong);
+      border: 1px solid rgba(108, 141, 113, 0.16);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .ranking-name {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .ranking-name strong {
+      display: block;
+      font-size: 17px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .ranking-name span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .ranking-percent {
+      flex-shrink: 0;
+      color: var(--accent-strong);
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .ranking-tagline {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .ranking-bar {
+      margin-top: 12px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(108, 141, 113, 0.12);
+      overflow: hidden;
+    }
+
+    .ranking-bar > span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+      box-shadow: 0 8px 16px rgba(77, 106, 83, 0.16);
+    }
+
     .studio-promo {
       width: min(100%, 860px);
       margin: 4px auto 0;
@@ -1042,6 +1224,7 @@
         <a class="btn-secondary intro-github-link" href="https://github.com/CTctikki/SBTI-test" target="_blank" rel="noreferrer">GitHub</a>
         <div class="intro-lead">
           <h1>MBTI已经过时，SBTI来了。</h1>
+          <p class="intro-stats-line" id="introStatsLine">已有 12,631 人完成测试</p>
           <div class="hero-actions hero-actions-single">
             <button id="startBtn" class="btn-primary">开始测试</button>
           </div>
@@ -1072,6 +1255,17 @@
               <span>现在不只是出结果，还顺手给你递刀子和配文。</span>
             </article>
           </div>
+        </section>
+
+        <section class="ranking-panel" aria-label="人气排行">
+          <div class="ranking-head">
+            <div>
+              <span class="ranking-kicker">人气榜单</span>
+              <h2 class="ranking-title">人气排行</h2>
+            </div>
+            <div class="ranking-total" id="rankingTotal">12,631 人已测</div>
+          </div>
+          <div class="ranking-list" id="rankingList"></div>
         </section>
 
         <section class="studio-promo" aria-label="CT 程序定制工作室推广">
@@ -1220,6 +1414,21 @@
       So1: { name: 'So1 社交主动性', model: '社交模型' },
       So2: { name: 'So2 人际边界感', model: '社交模型' },
       So3: { name: 'So3 表达与真实度', model: '社交模型' }
+    };
+    const HOMEPAGE_STATS = {
+      completedCount: 12631,
+      popularRankings: [
+        { code: 'LOVE-R', cn: '多情者', tagline: '爱意太满，现实里得有点分寸。', percentage: '11.7%' },
+        { code: 'SEXY', cn: '尤物', tagline: '您就是天生的尤物。', percentage: '9.7%' },
+        { code: 'MALO', cn: '吗喽', tagline: '人生是个副本，而我只是一只吗喽。', percentage: '6.4%' },
+        { code: 'OJBK', cn: '无所谓人', tagline: '我说随便，是真的随便。', percentage: '5.0%' },
+        { code: 'CTRL', cn: '拿捏者', tagline: '一旦上手，就想把局面排整齐。', percentage: '4.8%' },
+        { code: 'FAKE', cn: '伪饰者', tagline: '表面稳住，内心已经开会。', percentage: '4.5%' },
+        { code: 'SOLO', cn: '独行者', tagline: '一个人也行，而且更省电。', percentage: '4.1%' },
+        { code: 'SHIT', cn: '愤世者', tagline: '不是脾气差，是对世界滤镜太薄。', percentage: '3.8%' },
+        { code: 'ZZZZ', cn: '睡神', tagline: '能量很低，但态度很稳。', percentage: '3.5%' },
+        { code: 'IMSB', cn: '废物', tagline: '容易认真，也容易受伤。', percentage: '3.2%' }
+      ]
     };
     const questions = [
       {
@@ -2568,6 +2777,60 @@
       renderQuestions();
       showScreen('test');
     }
+
+    function formatCompletedCount(count) {
+      return `已有 ${count.toLocaleString('en-US')} 人完成测试`;
+    }
+
+    function formatRankingTotal(count) {
+      return `${count.toLocaleString('en-US')} 人已测`;
+    }
+
+    function renderHomepageStats() {
+      const introStatsLine = document.getElementById('introStatsLine');
+      const rankingTotal = document.getElementById('rankingTotal');
+      const rankingList = document.getElementById('rankingList');
+      const completedText =
+        typeof formatCompletedCount === 'function'
+          ? formatCompletedCount(HOMEPAGE_STATS.completedCount)
+          : `已有 ${HOMEPAGE_STATS.completedCount.toLocaleString('en-US')} 人完成测试`;
+      const rankingText =
+        typeof formatRankingTotal === 'function'
+          ? formatRankingTotal(HOMEPAGE_STATS.completedCount)
+          : `${HOMEPAGE_STATS.completedCount.toLocaleString('en-US')} 人已测`;
+
+      if (introStatsLine) {
+        introStatsLine.textContent = completedText;
+      }
+
+      if (rankingTotal) {
+        rankingTotal.textContent = rankingText;
+      }
+
+      if (!rankingList) return;
+
+      rankingList.innerHTML = HOMEPAGE_STATS.popularRankings.map((item, index) => {
+        const barWidth = Number.parseFloat(item.percentage) || 0;
+        return `
+          <article class="ranking-item">
+            <div class="ranking-item-top">
+              <span class="ranking-rank">${String(index + 1).padStart(2, '0')}</span>
+              <div class="ranking-name">
+                <strong>${item.cn}</strong>
+                <span>${item.code}</span>
+              </div>
+              <div class="ranking-percent">${item.percentage}</div>
+            </div>
+            <p class="ranking-tagline">${item.tagline}</p>
+            <div class="ranking-bar" aria-hidden="true">
+              <span style="width: ${barWidth}%"></span>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    renderHomepageStats();
 
     document.getElementById('startBtn').addEventListener('click', () => startTest(false));
     document.getElementById('backIntroBtn').addEventListener('click', () => showScreen('intro'));
