@@ -121,13 +121,14 @@ function loadFunctionSource(source, name) {
   const braceStart = source.indexOf('{', start);
   assert.ok(braceStart >= 0, `expected ${name} helper to have a body`);
 
-  return extractBracedBlock(source, braceStart);
+  const bodySource = extractBracedBlock(source, braceStart);
+  return `${source.slice(start, braceStart)}${bodySource}`;
 }
 
 function loadFunctionInSandbox(source, name, sandbox) {
   const functionSource = loadFunctionSource(source, name);
   const context = vm.createContext({ console, ...sandbox });
-  vm.runInContext(`result = (${functionSource});`, context);
+  vm.runInContext(`${functionSource}\nresult = ${name};`, context);
   return context.result;
 }
 
@@ -364,6 +365,19 @@ test('homepage stats config and renderer exist with the approved data', () => {
     nodes.rankingList.innerHTML.includes('11.7%'),
     'expected renderHomepageStats() to render ranking percentages',
   );
+
+  const rankingOutput = nodes.rankingList.innerHTML;
+  let cursor = 0;
+  for (const { code, percentage } of expectedRankings) {
+    const codeIndex = rankingOutput.indexOf(code, cursor);
+    assert.ok(codeIndex >= 0, `expected ranking output to include ${code}`);
+
+    const percentageIndex = rankingOutput.indexOf(percentage, codeIndex);
+    assert.ok(percentageIndex >= 0, `expected ranking output to include ${percentage} for ${code}`);
+    assert.ok(codeIndex < percentageIndex, `expected ${code} to appear before ${percentage}`);
+
+    cursor = percentageIndex + percentage.length;
+  }
 });
 
 test('homepage stats markup is scoped to the dedicated stats block', () => {
