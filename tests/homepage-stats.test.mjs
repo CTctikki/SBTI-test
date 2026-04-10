@@ -199,6 +199,15 @@ function createDomNode(initial = {}) {
     querySelectorAll() {
       return [];
     },
+    addEventListener(type, handler) {
+      if (!node.listeners) {
+        node.listeners = Object.create(null);
+      }
+      if (!node.listeners[type]) {
+        node.listeners[type] = [];
+      }
+      node.listeners[type].push(handler);
+    },
   };
 
   Object.defineProperty(node, 'textContent', {
@@ -269,6 +278,18 @@ function extractSectionById(source, id) {
   }
 
   assert.fail(`could not find closing section tag for #${id}`);
+}
+
+function extractScriptBlock(source) {
+  const startTag = '<script>';
+  const endTag = '</script>';
+  const startIndex = source.indexOf(startTag);
+  assert.ok(startIndex >= 0, 'expected a script block in index.html');
+
+  const endIndex = source.lastIndexOf(endTag);
+  assert.ok(endIndex > startIndex, 'expected a closing script tag in index.html');
+
+  return source.slice(startIndex + startTag.length, endIndex);
 }
 
 function formatCompletedCount(count) {
@@ -378,6 +399,89 @@ test('homepage stats config and renderer exist with the approved data', () => {
 
     cursor = percentageIndex + percentage.length;
   }
+});
+
+test('homepage stats render during real startup', () => {
+  const script = extractScriptBlock(html);
+  const stats = parseConstObject(html, 'HOMEPAGE_STATS');
+  const nodes = {
+    intro: createDomNode({ tagName: 'SECTION' }),
+    test: createDomNode({ tagName: 'SECTION' }),
+    result: createDomNode({ tagName: 'SECTION' }),
+    questionList: createDomNode(),
+    progressBar: createDomNode({ tagName: 'DIV' }),
+    progressText: createDomNode({ tagName: 'DIV' }),
+    submitBtn: createDomNode({ tagName: 'BUTTON' }),
+    testHint: createDomNode({ tagName: 'DIV' }),
+    posterBox: createDomNode({ tagName: 'DIV' }),
+    posterImage: createDomNode({ tagName: 'IMG' }),
+    posterStatus: createDomNode({ tagName: 'DIV' }),
+    retryPosterBtn: createDomNode({ tagName: 'BUTTON' }),
+    dimList: createDomNode({ tagName: 'DIV' }),
+    shareTitle: createDomNode({ tagName: 'DIV' }),
+    shareRoast: createDomNode({ tagName: 'DIV' }),
+    shareCaption: createDomNode({ tagName: 'DIV' }),
+    shareHook: createDomNode({ tagName: 'DIV' }),
+    shareTags: createDomNode({ tagName: 'DIV' }),
+    resultModeKicker: createDomNode({ tagName: 'DIV' }),
+    resultTypeName: createDomNode({ tagName: 'DIV' }),
+    matchBadge: createDomNode({ tagName: 'DIV' }),
+    resultTypeSub: createDomNode({ tagName: 'DIV' }),
+    resultDesc: createDomNode({ tagName: 'DIV' }),
+    posterCaption: createDomNode({ tagName: 'DIV' }),
+    funNote: createDomNode({ tagName: 'DIV' }),
+    startBtn: createDomNode({ tagName: 'BUTTON' }),
+    backIntroBtn: createDomNode({ tagName: 'BUTTON' }),
+    restartBtn: createDomNode({ tagName: 'BUTTON' }),
+    toTopBtn: createDomNode({ tagName: 'BUTTON' }),
+    introStatsLine: createDomNode({ tagName: 'P' }),
+    rankingTotal: createDomNode({ tagName: 'DIV' }),
+    rankingList: createDomNode({ tagName: 'DIV' }),
+  };
+
+  const context = vm.createContext({
+    console,
+    HOMEPAGE_STATS: stats,
+    document: {
+      getElementById(id) {
+        return nodes[id] ?? createDomNode();
+      },
+      querySelector() {
+        return null;
+      },
+      querySelectorAll() {
+        return [];
+      },
+      createElement(tagName) {
+        return createDomNode({ tagName: tagName.toUpperCase() });
+      },
+      createTextNode(text) {
+        return createDomNode({ tagName: '#text', textContent: text });
+      },
+    },
+    window: {},
+  });
+
+  vm.runInContext(script, context);
+
+  assert.equal(
+    nodes.introStatsLine.textContent,
+    formatCompletedCount(12631),
+    'expected the real startup path to populate the intro stats line',
+  );
+  assert.equal(
+    nodes.rankingTotal.textContent,
+    formatRankingTotal(12631),
+    'expected the real startup path to populate the ranking total',
+  );
+  assert.ok(
+    nodes.rankingList.innerHTML.includes('LOVE-R'),
+    'expected the real startup path to render the ranking list',
+  );
+  assert.ok(
+    nodes.startBtn.listeners?.click?.length > 0,
+    'expected startup to continue far enough to attach page listeners',
+  );
 });
 
 test('homepage stats markup is scoped to the dedicated stats block', () => {
